@@ -4,13 +4,21 @@ addons:
   apt:
     packages:
       - redis-server
-  postgresql: '9.3'
+      - postgresql-10
+      - postgresql-client-10
+  postgresql: '10'
+
 
 go:
 - "1.10"
 
 services:
 - redis-server
+
+before_install:
+  - sudo sed -i -e '/local.*peer/s/postgres/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
+  - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/10/main/postgresql.conf
+  - sudo service postgresql restart 10
 
 before_script:
 - psql -U postgres -c "CREATE USER courier WITH PASSWORD 'courier';"
